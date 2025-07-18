@@ -28,22 +28,34 @@ class ChatApp:
 
         self.setup_start_screen()
 
-                # ==== 전화번호 매핑 ==== 
-        # key: 전화번호(str), 
-        # value: dict(name: str, img_path: str, description: str)
-        self.phone_book = {
-            "01011112222": {
-                "name": "용의자 A",
-                "img_path": "images/suspect_a.png",
-                "description": "사건 A의 주요 용의자입니다."
+        # ==== 난이도별 전화번호 매핑 ====
+        # key: 난이도, value: { 전화번호: {name, img_path, description} }
+        self.phone_books = {
+            "쉬움": {
+                "01011112222": {
+                    "name": "초보 용의자 A",
+                    "img_path": "images/beginner_suspect.png",
+                    "description": "쉬움 난이도의 주요 용의자입니다."
+                },
             },
-            "01033334444": {
-                "name": "증인 B",
-                "img_path": "images/witness_b.png",
-                "description": "사건 현장을 목격한 증인입니다."
+            "중간": {
+                "01022223333": {
+                    "name": "중간 증인 B",
+                    "img_path": "images/mid_witness.png",
+                    "description": "중간 난이도의 증인입니다."
+                },
             },
-            # ... 필요한 만큼 추가 ...
+            "어려움": {
+                "01033334444": {
+                    "name": "고급 용의자 C",
+                    "img_path": "images/hard_suspect.png",
+                    "description": "어려움 난이도의 핵심 용의자입니다."
+                },
+            }
         }
+
+        # 현재 쓰게 될 사전 (configure_partners에서 덮어씌워짐)
+        self.phone_book = {}
 
     def clear_frames(self):
         for frame in self.frames.values():
@@ -127,6 +139,9 @@ class ChatApp:
 
         # 기본 선택
         self.current_contact = self.CHAT_PARTNERS[0]
+
+        # 난이도별 전화번호 사전 로드
+        self.phone_book = self.phone_books.get(difficulty, {})
 
     # ==== 메인 인터페이스 시작 ====
     def start_main_interface(self, difficulty):
