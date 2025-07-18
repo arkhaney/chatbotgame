@@ -28,6 +28,23 @@ class ChatApp:
 
         self.setup_start_screen()
 
+                # ==== 전화번호 매핑 ==== 
+        # key: 전화번호(str), 
+        # value: dict(name: str, img_path: str, description: str)
+        self.phone_book = {
+            "01011112222": {
+                "name": "용의자 A",
+                "img_path": "images/suspect_a.png",
+                "description": "사건 A의 주요 용의자입니다."
+            },
+            "01033334444": {
+                "name": "증인 B",
+                "img_path": "images/witness_b.png",
+                "description": "사건 현장을 목격한 증인입니다."
+            },
+            # ... 필요한 만큼 추가 ...
+        }
+
     def clear_frames(self):
         for frame in self.frames.values():
             frame.destroy()
@@ -348,18 +365,34 @@ class ChatApp:
                     self.add_message(line.strip(), is_user=True)
 
     def add_new_contact(self):
-        new_name = simpledialog.askstring("대화상대 추가", "새 대화상대 이름을 입력하세요:")
-        if not new_name or new_name.strip() == "" or new_name in self.CHAT_PARTNERS:
-            return
-        new_name = new_name.strip()
-        self.CHAT_PARTNERS.append(new_name)
-        self.contact_list.insert(tk.END, new_name)
-        self.profiles[new_name] = {
-            "img_path": "images/default.png",
-            "description": f"{new_name}의 기본 프로필입니다."
-        }
-        with open(f"chat_{new_name}.txt", "w", encoding="utf-8") as f:
-            f.write("")
+        # 전화번호 입력 받기
+        phone = simpledialog.askstring("대화상대 추가", "전화번호(숫자만)를 입력하세요:")
+        if not phone or not phone.isdigit():
+            return  # 취소 또는 숫자가 아닌 입력 무시
+
+        # 미리 설정된 번호인지 체크
+        if phone in self.phone_book:
+            info = self.phone_book[phone]
+            new_name = info["name"]
+            # 프로필 딕셔너리에 미리 저장
+            self.profiles[new_name] = {
+                "img_path": info["img_path"],
+                "description": info["description"]
+            }
+        else:
+            # 등록된 번호가 아니면 그냥 번호 자체를 이름으로 사용
+            new_name = phone
+            self.profiles[new_name] = {
+                "img_path": "images/default.png",
+                "description": f"{new_name} (사전 정보 없음)"
+            }
+
+        # 리스트와 내부 데이터 구조에 반영
+        if new_name not in self.CHAT_PARTNERS:
+            self.CHAT_PARTNERS.append(new_name)
+            self.contact_list.insert(tk.END, new_name)
+            # 대화 기록용 파일 미리 생성
+            open(f"chat_{new_name}.txt", "w", encoding="utf-8").close()
 
     def open_conclusion(self):
         # Toplevel 창 띄우기
