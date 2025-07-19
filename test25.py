@@ -38,13 +38,6 @@ class ChatApp:
                     "description": "쉬움 난이도의 주요 용의자입니다."
                 },
             },
-            "중간": {
-                "01022223333": {
-                    "name": "중간 증인 B",
-                    "img_path": "images/mid_witness.png",
-                    "description": "중간 난이도의 증인입니다."
-                },
-            },
             "어려움": {
                 "01033334444": {
                     "name": "고급 용의자 C",
@@ -81,7 +74,7 @@ class ChatApp:
 
         tk.Label(diff_frame, text="난이도를 선택하세요", font=("Arial", 20), bg=self.BG_COLOR).pack(pady=30)
 
-        for level in ["쉬움", "중간", "어려움"]:
+        for level in ["쉬움","어려움"]:
             btn = tk.Button(diff_frame, text=level, font=("Arial", 14),
                             width=15, command=lambda l=level: self.start_main_interface(l))
             btn.pack(pady=10)
@@ -98,18 +91,6 @@ class ChatApp:
                 "친절봇": {
                     "img_path": "images/friendly.png",
                     "description": "항상 친절하게 대답해주는 봇이에요."
-                }
-            }
-        elif difficulty == "중간":
-            self.CHAT_PARTNERS = ["챗봇 A", "챗봇 B"]
-            self.profiles = {
-                "챗봇 A": {
-                    "img_path": "images/chatbot_a.png",
-                    "description": "챗봇 A는 친절하고 똑똑한 AI입니다."
-                },
-                "챗봇 B": {
-                    "img_path": "images/chatbot_b.png",
-                    "description": "챗봇 B는 유머러스하고 재치 있는 AI입니다."
                 }
             }
         elif difficulty == "어려움":
