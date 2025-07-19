@@ -248,7 +248,58 @@ class ChatApp:
             self.case_contents.append(content)
 
         # 첫 번째 탭 내용 표시
-        self.case_contents[0].pack(fill="both", expand=True)
+        # 사건 내용 영역
+        self.case_data = {
+            "쉬움": {
+                "사건 A": [("2000년 뉴스", "2000년에 발생한 사건의 개요입니다."),
+                        ("초기 용의자", "당시 용의자는 3명이었으며, 모두 알리바이를 주장했습니다.")],
+                "사건 B": [("2010년 CCTV", "사건 당일 CCTV 기록이 일부 손상되었습니다.")],
+                "사건 C": [("2020년 탐문 결과", "이웃의 증언에 따르면 평소와 다른 점이 관찰되었다고 합니다.")]
+            },
+            "어려움": {
+                "사건 A": [("2000년 수사보고서", "상세한 분석이 포함된 보고서입니다."),
+                        ("현장 사진", "피해자의 위치와 주변 환경을 담은 사진.")],
+                "사건 B": [("2010년 감식결과", "지문과 DNA가 일치하지 않았습니다.")],
+                "사건 C": [("2020년 금융기록", "금전 거래 내역이 수상하다는 의견이 제시되었습니다.")]
+            }
+        }
+
+        self.case_contents = []
+
+        for i in range(3):
+            content_frame = tk.Frame(file_panel, bg="#ffffff", bd=0, relief="solid")
+
+            # 스크롤 가능한 Canvas + 내부 Frame
+            canvas = tk.Canvas(content_frame, bg="#ffffff", highlightthickness=0)
+            scrollbar = tk.Scrollbar(content_frame, command=canvas.yview)
+            canvas.configure(yscrollcommand=scrollbar.set)
+
+            inner = tk.Frame(canvas, bg="#ffffff")
+            canvas.create_window((0, 0), window=inner, anchor="nw")
+
+            def on_configure(e, c=canvas, i=inner):
+                c.configure(scrollregion=c.bbox("all"))
+            inner.bind("<Configure>", on_configure)
+
+            canvas.pack(side="left", fill="both", expand=True)
+            scrollbar.pack(side="right", fill="y")
+
+            # 정보 카드 추가
+            current_tab = tab_names[i]
+            current_data = self.case_data[self.difficulty][current_tab]
+
+            for title, detail in current_data:
+                card = tk.Frame(inner, bg="#f5f5f5", bd=1, relief="solid")
+                card.pack(fill="x", padx=10, pady=5)
+
+                btn = tk.Button(
+                    card, text=title, bg="#f5f5f5", font=("Arial", 11), bd=0, anchor="w",
+                    command=lambda t=title, d=detail: self.open_info_popup(t, d)
+                )
+                btn.pack(fill="both", padx=10, pady=10)
+
+            self.case_contents.append(content_frame)
+
 
         # ===== 우측 프로필 패널 =====
         sidebar_right = tk.Frame(self.main_frame, bg=self.SIDEBAR_COLOR)
@@ -275,6 +326,22 @@ class ChatApp:
         tk.Button(btn_frame, text="나가기", command=self.root.quit).pack(fill="x", pady=2)
 
         self.update_profile_by_name(self.current_contact)
+
+        switch_tab(0)
+
+
+        # ==== 팝업 함수 추가 ====
+    def open_info_popup(self, title, detail):
+        win = tk.Toplevel(self.root)
+        win.title(title)
+        win.geometry("400x300")
+        win.configure(bg="white")
+
+        tk.Label(win, text=title, bg="white", font=("Arial", 14, "bold")).pack(anchor="w", padx=15, pady=(15, 5))
+        text = tk.Text(win, wrap="word", font=("Arial", 11), bg="white", relief="flat")
+        text.insert(tk.END, detail)
+        text.config(state="disabled")
+        text.pack(expand=True, fill="both", padx=15, pady=(0, 15))
 
     # ==== 말풍선 추가 ====
     def add_message(self, text, is_user=True):
