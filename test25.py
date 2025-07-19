@@ -264,6 +264,7 @@ class ChatApp:
             }
         }
 
+        # 사건 내용 영역
         self.case_contents = []
 
         for i in range(3):
@@ -275,11 +276,11 @@ class ChatApp:
             canvas.configure(yscrollcommand=scrollbar.set)
 
             inner = tk.Frame(canvas, bg="#ffffff")
-            canvas.create_window((0, 0), window=inner, anchor="nw")
+            inner_id = canvas.create_window((0, 0), window=inner, anchor="nw")
 
-            def on_configure(e, c=canvas, i=inner):
-                c.configure(scrollregion=c.bbox("all"))
-            inner.bind("<Configure>", on_configure)
+            # 캔버스 크기 바뀔 때 inner 폭 조정
+            canvas.bind("<Configure>", lambda e, c=canvas, i=inner_id: c.itemconfigure(i, width=e.width))
+            inner.bind("<Configure>", lambda e, c=canvas: c.configure(scrollregion=c.bbox("all")))
 
             canvas.pack(side="left", fill="both", expand=True)
             scrollbar.pack(side="right", fill="y")
@@ -290,20 +291,22 @@ class ChatApp:
 
             for title, detail in current_data:
                 card = tk.Frame(inner, bg="#f5f5f5", bd=0, relief="flat")
-                card.pack(fill="both", expand=True, padx=0, pady=8)  # 가로로 넓게
+                card.pack(fill="x", expand=True, padx=10, pady=8)  # 가로로 넓게
 
                 btn = tk.Button(
                     card,
                     text=title,
-                    font=("Arial", 13),  # 더 크게
+                    font=("Arial", 13),
                     bg="#f5f5f5",
                     bd=0,
                     anchor="w",
+                    wraplength=600,  # wraplength는 원하는 길이로 조정 가능
                     command=lambda t=title, d=detail: self.open_info_popup(t, d)
                 )
-                btn.pack(fill="both", expand=True, padx=30, pady=20)  # 여백으로 크기 조절
+                btn.pack(fill="x", expand=True, padx=20, pady=20)
 
             self.case_contents.append(content_frame)
+
 
         # ===== 우측 프로필 패널 =====
         sidebar_right = tk.Frame(self.main_frame, bg=self.SIDEBAR_COLOR)
