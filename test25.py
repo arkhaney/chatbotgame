@@ -290,20 +290,27 @@ class ChatApp:
             current_data = self.case_data[self.difficulty][current_tab]
 
             for title, detail in current_data:
-                card = tk.Frame(inner, bg="#f5f5f5", bd=0, relief="flat")
-                card.pack(fill="x", expand=True, padx=10, pady=8)  # 가로로 넓게
+                # 카드 상자 프레임
+                card = tk.Frame(inner, bg="#ffffff", bd=0, relief="flat")
+                card.pack(fill="x", expand=True, padx=10, pady=0)  # 간격 없애기
 
+                # 버튼 (정보 타이틀)
                 btn = tk.Button(
                     card,
                     text=title,
                     font=("Arial", 13),
-                    bg="#f5f5f5",
+                    bg="#ffffff",
                     bd=0,
                     anchor="w",
-                    wraplength=600,  # wraplength는 원하는 길이로 조정 가능
+                    height=3,  # 높이를 키움
+                    wraplength=600,
                     command=lambda t=title, d=detail: self.open_info_popup(t, d)
                 )
-                btn.pack(fill="x", expand=True, padx=20, pady=20)
+                btn.pack(fill="x", expand=True, padx=20, pady=(10, 10))  # 버튼 내부 여백
+
+                # 🔽 연한 구분선 추가
+                separator = tk.Frame(inner, bg="#dddddd", height=1)
+                separator.pack(fill="x", padx=10)
 
             self.case_contents.append(content_frame)
 
