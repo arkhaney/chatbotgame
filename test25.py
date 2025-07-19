@@ -289,17 +289,21 @@ class ChatApp:
             current_data = self.case_data[self.difficulty][current_tab]
 
             for title, detail in current_data:
-                card = tk.Frame(inner, bg="#f5f5f5", bd=1, relief="solid")
-                card.pack(fill="x", padx=10, pady=5)
+                card = tk.Frame(inner, bg="#f5f5f5", bd=0, relief="flat")
+                card.pack(fill="both", expand=True, padx=0, pady=8)  # 가로로 넓게
 
                 btn = tk.Button(
-                    card, text=title, bg="#f5f5f5", font=("Arial", 11), bd=0, anchor="w",
+                    card,
+                    text=title,
+                    font=("Arial", 13),  # 더 크게
+                    bg="#f5f5f5",
+                    bd=0,
+                    anchor="w",
                     command=lambda t=title, d=detail: self.open_info_popup(t, d)
                 )
-                btn.pack(fill="both", padx=10, pady=10)
+                btn.pack(fill="both", expand=True, padx=30, pady=20)  # 여백으로 크기 조절
 
             self.case_contents.append(content_frame)
-
 
         # ===== 우측 프로필 패널 =====
         sidebar_right = tk.Frame(self.main_frame, bg=self.SIDEBAR_COLOR)
