@@ -11,6 +11,9 @@ class ChatApp:
         self.root.geometry("1000x600")
         self.root.minsize(800, 500)
 
+        self.root.attributes("-fullscreen", True)
+        self.root.bind("<Escape>", lambda e: self.root.attributes('-fullscreen', False))
+
         self.BG_COLOR = "#f7f7f7"
         self.SIDEBAR_COLOR = "#e0e0e0"
         self.CHAT_BG = "#ffffff"
@@ -129,7 +132,8 @@ class ChatApp:
         self.difficulty = difficulty
         self.configure_partners(difficulty)
         self.clear_frames()
-        self.setup_main_interface()  # 이건 2부에서 계속...
+        self.setup_main_interface()
+        self.start_tutorial()
     def setup_main_interface(self):
         self.root.configure(bg=self.BG_COLOR)
 
@@ -343,8 +347,64 @@ class ChatApp:
 
         switch_tab(0)
 
+    def start_tutorial(self):
+        self.tutorial_imgs = [
+            "C:\\Users\\A FEW GOOD MAN\\Desktop\\python\\tutor1.jpg",
+            "C:\\Users\\A FEW GOOD MAN\\Desktop\\python\\tutor2.jpg",
+            "C:\\Users\\A FEW GOOD MAN\\Desktop\\python\\tutor3.jpg"
+        ]
+        self.tutorial_idx = 0
+        self.show_tutorial_img()
 
-        # ==== 팝업 함수 추가 ====
+    def show_tutorial_img(self):
+        if self.tutorial_idx >= len(self.tutorial_imgs):
+            return  # setup_main_interface() 재호출 제거
+
+        path = self.tutorial_imgs[self.tutorial_idx]
+
+        try:
+            img = Image.open(path)
+        except FileNotFoundError:
+            print(f"튜토리얼 이미지 {path} 를 찾을 수 없습니다.")
+            return
+
+        # ==== 전체 화면 해상도 받아오기 ====
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+        img_width, img_height = img.size
+
+        # ==== 비율 유지 최대 확대 ====
+        scale = min(screen_width / img_width, screen_height / img_height)
+        new_width = int(img_width * scale)
+        new_height = int(img_height * scale)
+        img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
+
+        photo = ImageTk.PhotoImage(img)
+
+        # ==== 전체화면 창 띄우기 ====
+        self.tutorial_win = tk.Toplevel(self.root)
+        self.tutorial_win.attributes("-fullscreen", True)
+        self.tutorial_win.configure(bg="black")
+
+        # ==== 이미지 표시 ====
+        panel = tk.Label(self.tutorial_win, image=photo, bg="black")
+        panel.image = photo
+        panel.pack(expand=True)
+
+        # ==== 엔터키 반응 안 하는 문제 해결: 포커스 강제 지정 ====
+        self.tutorial_win.focus_set()
+        self.tutorial_win.bind("<Return>", self.next_tutorial_img)
+
+        # 선택적으로 ESC로 전체화면 해제
+        self.tutorial_win.bind("<Escape>", lambda e: self.tutorial_win.attributes("-fullscreen", False))
+
+    def next_tutorial_img(self, event=None):
+        if hasattr(self, 'tutorial_win') and self.tutorial_win:
+            self.tutorial_win.destroy()
+        self.tutorial_idx += 1
+        self.show_tutorial_img()
+
+    # ==== 팝업 함수 추가 ====
     def open_info_popup(self, title, detail):
         win = tk.Toplevel(self.root)
         win.title(title)
